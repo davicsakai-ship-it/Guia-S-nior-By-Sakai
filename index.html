@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progressão Sênior - Escoteiros do Brasil</title>
+    <style>
+        :root {
+            --grena: #8B1C31; /* Cor oficial do Ramo Sênior */
+            --grena-light: #B4334B;
+            --bg-color: #f4f4f4;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 50px;
+        }
+
+        /* Cabeçalho Fixo */
+        header {
+            background-color: var(--grena);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 1.5em; }
+        
+        .progress-container {
+            background-color: white;
+            color: var(--grena);
+            margin: 10px auto 0;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 600px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .etapa-badge {
+            background-color: var(--grena);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 1.1em;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .eixo-title {
+            background-color: #333;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+            text-transform: uppercase;
+            font-size: 1.2em;
+        }
+
+        .intro-title {
+            background-color: #0055a4; /* Azul para diferenciar a Acolhida */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-transform: uppercase;
+            font-size: 1.2em;
+        }
+
+        /* Estilo da Sanfona (Details/Summary) */
+        details {
+            background-color: white;
+            border-left: 5px solid var(--grena);
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        summary::-webkit-details-marker { display: none; }
+        summary:hover { background-color: #f9eef0; }
+        
+        .status-bloco {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #ddd;
+            color: #666;
+        }
+
+        .status-bloco.concluido {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .conteudo-bloco {
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        h4 {
+            color: var(--grena);
+            margin-top: 15px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .regra {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        label:hover { background-color: #ececec; }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            accent-color: var(--grena);
+        }
+
+        .alternativa { border-left: 3px solid #ff9800; background-color: #fff9f0;}
+        .modalidade-opcional { border-left: 3px solid #00BCD4; background-color: #f0fbfc;}
+
+        /* Estilo do Ícone e Modal (Pop-ups) */
+        .info-icon {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 1.1em;
+            filter: grayscale(0.2);
+        }
+        .info-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            border-left: 5px solid #ff9800; /* Cor para destacar que é um complemento */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover { color: black; }
+
+        .modal-footer {
+            margin-top: 15px;
+            font-size: 0.8em;
+            color: #666;
+            font-style: italic;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            text-align: right;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Progressão Ramo Sênior</h1>
+        <div class="progress-container">
+            <div>Blocos Concluídos: <span id="contador-blocos">0</span> / 18</div>
+            <div class="etapa-badge" id="etapa-atual">Escalada</div>
+        </div>
+    </header>
+
+    <div class="container" id="app">
+        <!-- O JS vai gerar o HTML aqui dentro -->
+    </div>
+
+    <!-- Estrutura do Modal de Informação (Pop-up) -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3 id="modal-title">Título</h3>
+            <p id="modal-text">Texto explicativo.</p>
+            <div class="modal-footer">Complemento retirado do Mappa Antigo (Ramo Sênior em Ação)</div>
+        </div>
+    </div>
+
+    <script>
+        // Função para abrir o Pop-up com explicações do Guia Antigo
+        function abrirModal(titulo, texto) {
+            document.getElementById('modal-title').textContent = titulo;
+            document.getElementById('modal-text').textContent = texto;
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        document.querySelector('.close-btn').onclick = function() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('modal')) {
+                document.getElementById('modal').style.display = 'none';
+            }
+        }
+
+        // Período Introdutório (Mappa Antigo)
+        const periodoIntrodutorio = [
+            "Conhecer a estrutura da Tropa Sênior;",
+            "Conhecer os membros da sua patrulha e os seus encargos;",
+            "Entender e usar o Lema do Escoteiro, o sinal, a saudação e o aperto de mão;",
+            "Reconhecer os sinais manuais e apitos de comandos; <span class='info-icon' onclick='abrirModal(\"Sinais e Apitos\", \"No guia antigo: 3 silvos longos = Chamada geral; 2 silvos longos = Chamada de monitores; 1 silvo longo = Intendentes. Sinais manuais são usados para formar filas, círculos, ferradura, etc.\")'>ℹ️</span>",
+            "Saber o grito da sua patrulha e conhecer o seu significado;",
+            "Conhecer o vestuário/uniforme escoteiro e o significado dos seus distintivos;",
+            "Conhecer o sistema de progressão do Ramo Sênior;",
+            "Saber como hastear e arriar a Bandeira Nacional; <span class='info-icon' onclick='abrirModal(\"Hasteamento e Arriamento\", \"O guia antigo instrui que a formação é feita com duas pessoas formando um triângulo retângulo com a adriça. A Bandeira Nacional é sempre a primeira a atingir o topo e a última a descer.\")'>ℹ️</span>",
+            "Conhecer os aspectos mais importantes da história do Escotismo e do seu Fundador;",
+            "Conhecer a Lei e Promessa Escoteira."
+        ];
+
+        // Banco de Dados extraído do Guia Sênior (Atualizado com Lógicas Opcionais e Pop-ups)
+        const guiaSenior = [
+            {
+                eixo: "Habilidades para a Vida",
+                blocos: [
+                    {
+                        id: "hab_aprender", nome: "Aprendizagem Contínua e Desenvolvimento Vocacional", minVar: 3,
+                        fixas: [
+                            "Conquistar uma especialidade sobre um tema novo."
+                        ],
+                        modalidades: [
+                            "MAR: Organizar visita a um porto, marina ou iate clube.",
+                            "AR: Organizar visita a um aeroporto ou aeroclube."
+                        ],
+                        variaveis: [
+                            "Explorar áreas profissionais (Feira de Profissões ou entrevistas).",
+                            "Atividades voluntárias ou estágios.",
+                            "Participar de palestras/workshops de orientação vocacional.",
+                            "Organizar atividade vocacional para a seção.",
+                            "Organizar oficina/curso sobre tema de interesse.",
+                            "Participar de feiras/mostras científicas."
+                        ],
+                        alternativas: ["Conquistar Especialidade (Gastronomia, Tecnologia, Educação, Idiomas, Ciênc. Humanas) ou Insígnia (Aprender, Mar/Ar)."]
+                    },
+                    {
+                        id: "hab_autonomia", nome: "Autonomia e Liderança", minVar: 4,
+                        fixas: [
+                            "Conhecer material de excursões e organizar mochila."
+                        ],
+                        modalidades: [
+                            "MAR: Construir e navegar em embarcação a vela/remo (Regras de Segurança)."
+                        ],
+                        variaveis: [
+                            "Planejar, executar e avaliar atividade (bem avaliado).",
+                            "Desenvolver planejamento orçamentário de atividade.",
+                            "Utilizar transporte coletivo urbano para atividade.",
+                            "Estratégia financeira para meta pessoal.",
+                            "Projeto de captação de recursos.",
+                            "Assumir diferentes encargos na patrulha.",
+                            "Planejar e conduzir grande jogo para a tropa."
+                        ],
+                        alternativas: ["Conquistar Especialidade: Empreendedorismo, Finanças, Liderança ou Viagens."]
+                    },
+                    {
+                        id: "hab_criatividade", nome: "Criatividade e Inovação", minVar: 3,
+                        fixas: [
+                            "Planejar e executar pioneirias inovadoras."
+                        ],
+                        modalidades: [
+                            "AR: Organizar um torneio aéreo."
+                        ],
+                        variaveis: [
+                            "Organizar Fogo de Conselho ou show de talentos.",
+                            "Organizar noite cultural.",
+                            "Produzir curta metragem/vídeo escoteiro.",
+                            "Apresentação artística/cultural para comunidade.",
+                            "Mostra sobre tema de interesse (curadoria).",
+                            "Concursos culturais, literários ou artísticos.",
+                            "Construir 'horizonte artificial' funcional (2 eixos)."
+                        ],
+                        alternativas: ["Conquistar Especialidade (Comunicações) ou Insígnia (Inovadores de Impacto)."]
+                    },
+                    {
+                        id: "hab_emocional", nome: "Inteligência Emocional", minVar: 4,
+                        fixas: [
+                            "Reconhecer riscos físicos/emocionais e manter a calma.",
+                            "Praticar feedback construtivo nas atividades."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Identificar mudanças de emoção repentinas e agir com respeito.",
+                            "Atividades aventureiras (enfrentar medos com segurança).",
+                            "Identificar situações de estresse e solucionar.",
+                            "Negociar responsabilidades familiares de forma madura.",
+                            "Conduzir dinâmicas de confiança/frustração."
+                        ],
+                        alternativas: []
+                    }
+                ]
+            },
+            {
+                eixo: "Meio Ambiente",
+                blocos: [
+                    {
+                        id: "ma_consumo", nome: "Consumo Responsável", minVar: 4,
+                        fixas: [],
+                        modalidades: [],
+                        variaveis: [
+                            "Liderar separação de resíduos em evento.",
+                            "Visitar estação de tratamento ou aterro.",
+                            "Projeto de descarte de lixo eletrônico.",
+                            "Oficina/debate: Crueltly-free, Veg, Upcycling ou Microplástico.",
+                            "Executar receita com cascas, talos ou sobras.",
+                            "Organizar brechó beneficente/feira de trocas.",
+                            "Visitar cooperativa de reciclagem."
+                        ],
+                        alternativas: ["Conquistar Especialidade (Agricultura Sustentável) ou Insígnia (Reduzir, Reciclar, Reutilizar)."]
+                    },
+                    {
+                        id: "ma_clima", nome: "Mudanças Climáticas", minVar: 4,
+                        fixas: [],
+                        modalidades: [],
+                        variaveis: [
+                            "Utilizar ferramentas meteorológicas no planejamento.",
+                            "Projeto sobre mudanças climáticas.",
+                            "Atividade ecológica urbana (identificar problemas/soluções).",
+                            "Participar de clubes de sustentabilidade.",
+                            "Uso de transporte alternativo (coletivo, bike) em atividade.",
+                            "Projeto comunitário de energias renováveis."
+                        ],
+                        alternativas: ["Conquistar Especialidade (Sustentabilidade) ou Insígnia (Energia Solar)."]
+                    },
+                    {
+                        id: "ma_bio", nome: "Preservação da Biodiversidade", minVar: 2,
+                        fixas: [
+                            "Atividade em Área de Proteção Ambiental (identificar bioma).",
+                            "Conhecer bioma aquático local e riscos.",
+                            "Observação de aves e métodos de voo."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Eventos sobre biodiversidade de ONGs/escolas.",
+                            "Ação com ONG ambiental.",
+                            "Coletar dados sobre espécies/qualidade da água.",
+                            "Projeto de abrigos, enriquecimento ou reintegração silvestre.",
+                            "Plantio de árvores nativas.",
+                            "Campanha de conscientização da fauna/flora.",
+                            "Palestras abertas à comunidade."
+                        ],
+                        alternativas: ["Conquistar Especialidades (Natureza, Educação Ambiental) ou Insígnia (Campeões da Natureza)."]
+                    },
+                    {
+                        id: "ma_arlivre", nome: "Vida ao Ar Livre", minVar: 5,
+                        fixas: [
+                            "Montar campo com pioneirias e amarras. <span class='info-icon' onclick='abrirModal(\"Pioneirias e Amarras\", \"Segundo o guia antigo, é essencial saber utilizar amarras como a quadrada, paralela, diagonal e tripé na construção de pioneirias básicas (ex: toldo, mesa com bancos, despensa, canto de lenhador, pórtico e intendência suspensa).\")'>ℹ️</span>",
+                            "Aplicar nós básicos e funcionais em acampamento. <span class='info-icon' onclick='abrirModal(\"Nós Básicos e Funcionais\", \"O Mappa antigo detalha os seguintes nós essenciais: volta redonda, pescador, oito, correr, balso pelo seio, catau, volta do salteador, nó de andaime, boca de lobo e volta do enfardador.\")'>ℹ️</span>",
+                            "Montagem e escolha de local para barraca.",
+                            "Manusear ferramentas de corte e sapa (segurança). <span class='info-icon' onclick='abrirModal(\"Ferramentas de Sapa e Corte\", \"No guia antigo (Ramo Sênior em Ação), exige-se demonstrar conhecimento nas regras de segurança no manuseio de facões e machadinhas, tomando cuidados rigorosos para a manutenção e conservação dessas ferramentas da patrulha.\")'>ℹ️</span>",
+                            "Três tipos de fogueira para refeição mateira. <span class='info-icon' onclick='abrirModal(\"Cozinha Mateira\", \"Cozinha mateira, segundo o guia antigo, é cozinhar à lenha e ao ar livre, preferencialmente sem o uso de utensílios convencionais. Exige também respeitar as regras de segurança na montagem e desmontagem da fogueira e normas do local.\")'>ℹ️</span>",
+                            "Excursão de patrulha na natureza.",
+                            "Acampamento de patrulha com baixo impacto.",
+                            "Orientação por carta topográfica, bússola e meios naturais. <span class='info-icon' onclick='abrirModal(\"Orientação e Bússola\", \"O guia antigo especifica: Conseguir se orientar utilizando uma carta e uma bússola ao mesmo tempo, sabendo escolher a melhor rota na carta topográfica, calculando distâncias, reconhecendo a direção do curso de um rio, cumes e depressões do terreno.\")'>ℹ️</span>"
+                        ],
+                        modalidades: [
+                            "MAR: Nós da modalidade do mar."
+                        ],
+                        variaveis: [
+                            "Acampamento volante.",
+                            "Selecionar materiais de campo.",
+                            "Construir pioneiria suspensa, torre ou ponte.",
+                            "Ancoragem e estiramento de cabos.",
+                            "Purificação de água e acondicionamento de alimentos.",
+                            "Pernoitar em abrigo natural.",
+                            "Pernoitar em bivaque/relento em ativ. aventureira.",
+                            "Rafting, rapel, escalada, trekking ou bike.",
+                            "Exploração de corpos d'água.",
+                            "Acampamento médio (3-5 dias) ou longo (6-10 dias)."
+                        ],
+                        alternativas: ["Conquistar Especialidades: Esportes de Aventura, Ecoturismo ou Habilidades Escoteiras."]
+                    }
+                ]
+            },
+            {
+                eixo: "Paz e Desenvolvimento",
+                blocos: [
+                    {
+                        id: "pd_comunidade", nome: "Comunidade", minVar: 2,
+                        fixas: [
+                            "10 horas de ação comunitária com instituições locais.",
+                            "Capacitar-se em curso de referência (Defesa Civil/Cruz Vermelha)."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Identificar riscos de desastres e protocolos de segurança.",
+                            "Planejar atividade comunitária (limpeza praça, visita asilo, etc).",
+                            "Criar biblioteca comunitária móvel.",
+                            "Organizar campanha de arrecadação.",
+                            "Representar tropa em fóruns/conselhos.",
+                            "Promover ações de educação ambiental/saúde em parceria."
+                        ],
+                        alternativas: ["Conquistar Esp. (Desenv Comunitário, Humanitárias, Inclusão) ou Insígnia (Desafio Comunitário, MP, EM)."]
+                    },
+                    {
+                        id: "pd_democracia", nome: "Democracia", minVar: 4,
+                        fixas: [
+                            "Participar ativamente do Conselho de Patrulha.",
+                            "Participar ativamente da Assembleia de Tropa.",
+                            "Participar da eleição de monitor."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Participar de Audiência Pública/consulta popular.",
+                            "Emitir Título de Eleitor e pesquisar propostas.",
+                            "Campanha de educação sobre voto e direitos.",
+                            "Participar de Assembleia do Grupo Escoteiro.",
+                            "Participar de Fórum de Grupo Escoteiro.",
+                            "Participar de grêmio estudantil.",
+                            "Debates, estudo de caso ou 'júri simulado'.",
+                            "Dinâmicas de mediação de conflitos."
+                        ],
+                        alternativas: ["Conquistar Especialidades: Equidade ou Políticas Públicas."]
+                    },
+                    {
+                        id: "pd_heranca", nome: "Herança Cultural", minVar: 5,
+                        fixas: [
+                            "Conduzir cerimônia de abertura.",
+                            "Hastear e arriar a Bandeira Nacional (apito marinheiro). <span class='info-icon' onclick='abrirModal(\"Hasteamento e Arriamento\", \"O guia antigo instrui que a formação é feita com duas pessoas formando um triângulo retângulo com a adriça. A Bandeira Nacional é sempre a primeira a atingir o topo e a última a descer.\")'>ℹ️</span>"
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Expedição para povos originários, quilombolas ou caiçaras.",
+                            "Recepção de escoteiros apresentando pontos da cidade.",
+                            "Tour cultural na cidade (museus, feiras, marcos).",
+                            "Participar de núcleos culturais da região (CTG, colônias, etc).",
+                            "Apresentar cultura popular brasileira em Fogo de Conselho.",
+                            "Festival regional para comunidade.",
+                            "Produzir peça de artesanato brasileiro.",
+                            "Apresentar cultura da cidade em evento."
+                        ],
+                        alternativas: ["Conquistar Especialidade: Cultura e Arte."]
+                    },
+                    {
+                        id: "pd_paz", nome: "Promoção da Paz", minVar: 5,
+                        fixas: [
+                            "Ação colaborativa sobre DH, Inter-religioso, Diversidade, etc."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Mesa redonda sobre idolatria, tribos, intolerância, etc.",
+                            "Atividade inter-religiosa.",
+                            "Simulação da ONU (direitos globais).",
+                            "Atividade com outra unidade escoteira.",
+                            "Jantar Internacional (culinária e Escotismo de fora).",
+                            "Jogos/solidariedade com jovens de igrejas/templos locais.",
+                            "Momento inter-religioso na seção."
+                        ],
+                        alternativas: ["Conquistar Esp. (Direitos Humanos, Diversidades) ou Insígnias (Lusofonia, Cone Sul, Diálogos)."]
+                    },
+                    {
+                        id: "pd_valores", nome: "Valores", minVar: 2,
+                        fixas: [
+                            "Avaliar vivência da Lei/Promessa e realizar Compromisso Sênior."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Avaliar progressão dos companheiros na patrulha.",
+                            "Explicar Lei e Promessa aos novos.",
+                            "Auxiliar companheiro no Compromisso Sênior.",
+                            "Debate de casos reais baseados em valores escoteiros."
+                        ],
+                        alternativas: []
+                    }
+                ]
+            },
+            {
+                eixo: "Saúde e Bem-estar",
+                blocos: [
+                    {
+                        id: "sb_corpo", nome: "Cuidado com o Corpo", minVar: 2,
+                        fixas: [
+                            "Capacitar-se em Primeiros Socorros completos (Cortes, RCP, Fraturas, Engasgos, Animais Peçonhentos, etc).",
+                            "Identificar condutas de risco nas atividades."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Experimentar modalidades esportivas diversas.",
+                            "Pesquisar propostas de saúde física e mental para a tropa.",
+                            "Oficinas/jogos inclusivos de diversidade física.",
+                            "Workshop: Anabolizantes, Drogas/Álcool, Distúrbios Alimentares.",
+                            "Organizar material de 1os socorros da patrulha.",
+                            "Workshop de prevenção de ISTs."
+                        ],
+                        alternativas: ["Conquistar Especialidade: Saúde."]
+                    },
+                    {
+                        id: "sb_espirito", nome: "Espiritualidade", minVar: 3,
+                        fixas: [],
+                        modalidades: [],
+                        variaveis: [
+                            "Conduzir momentos de silêncio, oração ou meditação.",
+                            "Atividades com jovens de diferentes crenças.",
+                            "Colaborar em celebrações religiosas da comunidade.",
+                            "Momento de reflexão e conexão com a natureza (Banho de floresta, gratidão)."
+                        ],
+                        alternativas: ["Conquistar Especialidade: Diálogo Inter-religioso."]
+                    },
+                    {
+                        id: "sb_habitos", nome: "Hábitos Saudáveis", minVar: 2,
+                        fixas: [
+                            "Cardápio de acampamento sustentável e sem industrializados.",
+                            "Praticar atividades físicas regularmente."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Manter canto de patrulha limpo.",
+                            "Planejar e realizar almoço/jantar saudável na patrulha.",
+                            "Praticar yoga, meditação ou relaxamento na natureza.",
+                            "Plano pessoal de hábitos saudáveis.",
+                            "Rotina de cuidado com ambiente doméstico."
+                        ],
+                        alternativas: ["Conquistar Especialidade: Esportes ou Educação Alimentar."]
+                    },
+                    {
+                        id: "sb_mente", nome: "Saúde Mental", minVar: 3,
+                        fixas: [
+                            "Buscar conhecimentos sobre Espaços Seguros no Escotismo.",
+                            "Reconhecer sinais de estresse em colegas e praticar escuta ativa (1os socorros mentais)."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Campanha de saúde mental (Ex: Setembro Amarelo).",
+                            "Hábitos/atividades para aliviar tensão do dia a dia.",
+                            "Convidar profissionais da área para a tropa.",
+                            "Organizar rotina offline de bem-estar.",
+                            "Técnicas de autoexpressão (Mindfulness, Teatro, Dança)."
+                        ],
+                        alternativas: ["Conquistar Especialidade: Saúde Mental e Bem-estar Emocional, Hobbies e Lazer."]
+                    },
+                    {
+                        id: "sb_vinculos", nome: "Vínculos Saudáveis", minVar: 3,
+                        fixas: [
+                            "Identificar e combater bullying e cyberbullying."
+                        ],
+                        modalidades: [],
+                        variaveis: [
+                            "Encontro social com jovens de diferentes realidades.",
+                            "Roda de conversa sobre confiança e respeito.",
+                            "Projeto em equipe de interesse para gerar colaboração.",
+                            "Reuniões de patrulha com espaço de escuta e empatia.",
+                            "Assumir responsabilidades no ambiente familiar.",
+                            "Convidar colega não escoteiro para o Fogo de Conselho."
+                        ],
+                        alternativas: ["Conquistar Especialidade: Saúde Sexual e Reprodutiva."]
+                    }
+                ]
+            }
+        ];
+
+        const app = document.getElementById('app');
+
+        // Renderizar Período Introdutório
+        const introDiv = document.createElement('div');
+        introDiv.innerHTML = `<div class="intro-title">Período Introdutório (Acolhida)</div>`;
+        let introHtml = `<div class="conteudo-bloco"><h4>Passos Iniciais <span class="regra">(Para novos Seniores/Guias)</span></h4>`;
+        periodoIntrodutorio.forEach((texto, i) => {
+            introHtml += `<label><input type="checkbox" class="cb-intro" id="intro_${i}"> ${texto}</label>`;
+        });
+        introHtml += `</div>`;
+        
+        const introDetails = document.createElement('details');
+        introDetails.open = true;
+        introDetails.innerHTML = `
+            <summary>
+                Integração na Tropa Sênior
+                <span class="status-bloco" id="status_intro">Pendente</span>
+            </summary>
+            ${introHtml}
+        `;
+        introDiv.appendChild(introDetails);
+        app.appendChild(introDiv);
+
+
+        // Geração do HTML dinâmico dos Eixos e Blocos
+        guiaSenior.forEach(eixo => {
+            const eixoDiv = document.createElement('div');
+            eixoDiv.innerHTML = `<div class="eixo-title">${eixo.eixo}</div>`;
+            
+            eixo.blocos.forEach(bloco => {
+                let htmlFixas = '';
+                if(bloco.fixas && bloco.fixas.length > 0) {
+                    htmlFixas = `<h4>Ações Fixas (Obrigatórias)</h4>`;
+                    bloco.fixas.forEach((texto, i) => {
+                        htmlFixas += `<label><input type="checkbox" class="cb-fixa" data-bloco="${bloco.id}" id="${bloco.id}_fixa_${i}"> ${texto}</label>`;
+                    });
+                }
+
+                let htmlMod = '';
+                if(bloco.modalidades && bloco.modalidades.length > 0) {
+                    htmlMod = `<h4>Ações Específicas de Modalidades <span class="regra">(Opcionais / Não bloqueiam a progressão básica)</span></h4>`;
+                    bloco.modalidades.forEach((texto, i) => {
+                        htmlMod += `<label class="modalidade-opcional"><input type="checkbox" class="cb-mod" data-bloco="${bloco.id}" id="${bloco.id}_mod_${i}"> <strong>MÓDULO:</strong> ${texto}</label>`;
+                    });
+                }
+
+                let htmlVar = `<h4>Ações Variáveis <span class="regra">(Mínimo de ${bloco.minVar} ações ou usar Alternativa)</span></h4>`;
+                bloco.variaveis.forEach((texto, i) => {
+                    htmlVar += `<label><input type="checkbox" class="cb-var" data-bloco="${bloco.id}" id="${bloco.id}_var_${i}"> ${texto}</label>`;
+                });
+
+                let htmlAlt = '';
+                if(bloco.alternativas.length > 0) {
+                    htmlAlt = `<h4>Alternativa</h4>`;
+                    bloco.alternativas.forEach((texto, i) => {
+                        htmlAlt += `<label class="alternativa"><input type="checkbox" class="cb-alt" data-bloco="${bloco.id}" id="${bloco.id}_alt_${i}"> <strong>SUBSTITUI AS VARIÁVEIS:</strong> ${texto}</label>`;
+                    });
+                }
+
+                const detailBlock = document.createElement('details');
+                detailBlock.dataset.id = bloco.id;
+                detailBlock.dataset.minvar = bloco.minVar;
+                detailBlock.innerHTML = `
+                    <summary>
+                        ${bloco.nome}
+                        <span class="status-bloco" id="status_${bloco.id}">Pendente</span>
+                    </summary>
+                    <div class="conteudo-bloco">
+                        ${htmlFixas}
+                        ${htmlMod}
+                        ${htmlVar}
+                        ${htmlAlt}
+                    </div>
+                `;
+                eixoDiv.appendChild(detailBlock);
+            });
+            app.appendChild(eixoDiv);
+        });
+
+        // Lógica de Salvamento e Cálculo de Progressão
+        function updateLogic() {
+            const inputs = document.querySelectorAll('input[type="checkbox"]');
+            
+            // Salvar no localStorage
+            const state = {};
+            inputs.forEach(input => state[input.id] = input.checked);
+            localStorage.setItem('guiaSeniorSave', JSON.stringify(state));
+
+            // Avaliar Período Introdutório
+            const cbIntro = document.querySelectorAll('.cb-intro');
+            let introOk = true;
+            cbIntro.forEach(cb => { if(!cb.checked) introOk = false; });
+            const statusIntro = document.getElementById('status_intro');
+            if(introOk) {
+                statusIntro.textContent = "Concluído!";
+                statusIntro.classList.add("concluido");
+            } else {
+                statusIntro.textContent = "Pendente";
+                statusIntro.classList.remove("concluido");
+            }
+
+            let blocosConcluidos = 0;
+
+            // Avaliar cada bloco da Progressão
+            guiaSenior.forEach(eixo => {
+                eixo.blocos.forEach(b => {
+                    const cbFixas = document.querySelectorAll(`.cb-fixa[data-bloco="${b.id}"]`);
+                    const cbVars = document.querySelectorAll(`.cb-var[data-bloco="${b.id}"]`);
+                    const cbAlts = document.querySelectorAll(`.cb-alt[data-bloco="${b.id}"]`);
+                    
+                    let fixasOk = true;
+                    cbFixas.forEach(cb => { if(!cb.checked) fixasOk = false; });
+                    
+                    let varCount = 0;
+                    cbVars.forEach(cb => { if(cb.checked) varCount++; });
+
+                    let altOk = false;
+                    cbAlts.forEach(cb => { if(cb.checked) altOk = true; });
+
+                    const statusBadge = document.getElementById(`status_${b.id}`);
+                    
+                    // Perceba que as "modalidades" (.cb-mod) não entram no critério obrigatório aqui!
+                    if (fixasOk && (varCount >= b.minVar || altOk)) {
+                        statusBadge.textContent = "Concluído!";
+                        statusBadge.classList.add("concluido");
+                        blocosConcluidos++;
+                    } else {
+                        statusBadge.textContent = "Pendente";
+                        statusBadge.classList.remove("concluido");
+                    }
+                });
+            });
+
+            // Atualizar barra superior
+            document.getElementById('contador-blocos').textContent = blocosConcluidos;
+            const etapaBadge = document.getElementById('etapa-atual');
+            
+            if (blocosConcluidos >= 12) {
+                etapaBadge.textContent = "Etapa: AZIMUTE 🏆";
+                etapaBadge.style.backgroundColor = "#ff9800"; // Dourado
+                etapaBadge.style.color = "#000";
+            } else if (blocosConcluidos >= 6) {
+                etapaBadge.textContent = "Etapa: CONQUISTA";
+                etapaBadge.style.backgroundColor = "#28a745"; // Verde
+                etapaBadge.style.color = "#fff";
+            } else {
+                etapaBadge.textContent = "Etapa: ESCALADA";
+                etapaBadge.style.backgroundColor = "var(--grena)";
+                etapaBadge.style.color = "#fff";
+            }
+        }
+
+        // Recuperar dados ao abrir a página
+        function loadData() {
+            const inputs = document.querySelectorAll('input[type="checkbox"]');
+            const saved = JSON.parse(localStorage.getItem('guiaSeniorSave') || '{}');
+            inputs.forEach(input => {
+                if(saved[input.id]) {
+                    input.checked = true;
+                }
+            });
+            updateLogic();
+        }
+
+        // Adicionar eventos de clique em todos os checkboxes (após a renderização)
+        document.querySelectorAll('input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', updateLogic);
+        });
+
+        // Carregar na inicialização
+        loadData();
+    </script>
+</body>
+</html>
